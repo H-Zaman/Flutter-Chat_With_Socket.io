@@ -33,9 +33,13 @@ class _HomeScreenState extends State<HomeScreen> {
   connectSocket() async{
     await G.socketUtils.initSocket(G.loggedInUser);
     G.socketUtils.connectToSocket();
+
     G.socketUtils.onlineUserList(onlineUserList);
+
     G.socketUtils.setOnChatMessageReceivedListener(onChatMessageReceived);
     G.socketUtils.setOnMessageBackFromServer(onMessageBackFromServer);
+
+
     G.socketUtils.setConnectListener(onConnect);
     G.socketUtils.setOnDisconnectListener(onDisconnect);
     G.socketUtils.setOnErrorListener(onError);
@@ -44,17 +48,15 @@ class _HomeScreenState extends State<HomeScreen> {
 
   onChatMessageReceived(data){
     print('onChatMessageReceived');
-    print(data);
     ChatMessageModel chatMessageModel = ChatMessageModel.fromJson(data);
-    _getMessage.messages.forEach((element) {
-      // element.id
-      //TODO
-    });
+    _getMessage.messages.add(chatMessageModel);
+    showNotification(chatMessageModel.from);
   }
 
   onMessageBackFromServer(data){
     print('onMessageBackFromServer');
-    //TODO
+    ChatMessageModel chatMessageModel = ChatMessageModel.fromJson(data);
+    _getMessage.messages.add(chatMessageModel);
   }
 
   onlineUserList(data){
@@ -64,6 +66,24 @@ class _HomeScreenState extends State<HomeScreen> {
         _getOnlineUsers.addUser(int.parse(e));
       });
     });
+  }
+
+  showNotification(int id){
+    String userName = getUserName(id);
+    Get.snackbar(
+      'New Message',
+      'From $userName'
+    );
+  }
+
+  getUserName(int id){
+    String name;
+    userList.forEach((element) {
+      if(element.id == id){
+        name = element.name;
+      }
+    });
+    return name ?? "a friend";
   }
 
   onConnect(data) {
@@ -97,6 +117,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void dispose() {
     G.socketUtils.closeConnection();
+    _getMessage.clearAll();
     super.dispose();
   }
 
@@ -134,6 +155,7 @@ class _HomeScreenState extends State<HomeScreen> {
               User user = userList[index];
               return GestureDetector(
                 onTap: (){
+                  _getMessage.clearAll();
                   G.toUser = user;
                   Get.to(ChatScreen());
                 },

@@ -1,16 +1,11 @@
-# chat_app
+# Dart Chat
 
-A new Flutter application.
+A basic communication chat app.
 
-## Getting Started
+You can login using a give ID, and chat with other users.
+It also shows updated information when a user logs in or goes offline.
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+![HomeScreen](https://i.ibb.co/s9tzPYy/Screenshot-1602324954.png)
+![Users Page](https://i.ibb.co/xFXMN63/Screenshot-1602325321.png)
+![Users Page 2](https://i.ibb.co/mJftwsf/Screenshot-1602325375.png)
+![Chat Screen](https://i.ibb.co/dkky8GK/Screenshot-1602325365.png)

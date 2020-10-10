@@ -4,8 +4,8 @@ import 'package:adhara_socket_io/adhara_socket_io.dart';
 
 class SocketUtils {
   //
-  // static String _connectUrl = 'https://dartchat.herokuapp.com/';
-  static String _connectUrl = 'http://192.168.1.108:9000/';
+  static String _connectUrl = 'https://dartchat.herokuapp.com/';
+  // static String _connectUrl = 'http://192.168.1.108:9000/';
 
   // Events
   static const String ON_MESSAGE_RECEIVED = 'receive_message';

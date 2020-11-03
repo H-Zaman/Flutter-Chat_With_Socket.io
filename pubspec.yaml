@@ -31,6 +31,8 @@ dependencies:
   get: ^3.12.1
   adhara_socket_io: ^0.4.2+1
   intl: 0.16.1
+  graphql_flutter: ^3.1.0
+
 
 dev_dependencies:
   flutter_test:

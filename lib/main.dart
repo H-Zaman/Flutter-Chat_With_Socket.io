@@ -1,14 +1,17 @@
+import 'package:chat_app/GRAPHQL/getControolers/userToken.dart';
 import 'package:chat_app/controller/message.dart';
 import 'package:chat_app/controller/onlineUsers.dart';
 import 'package:chat_app/homeScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'GRAPHQL/loginPage.dart';
 import 'global.dart';
 import 'models/user.dart';
 
 void main() {
   final GetOnlineUsers getOnlineUsers = Get.put(GetOnlineUsers());
   final GetMessage message = Get.put(GetMessage());
+  final GetUserToken getUserToken = Get.put(GetUserToken());
   runApp(MyApp());
 }
 
@@ -29,7 +32,21 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
+  @override
+  _HomePageState createState() => _HomePageState();
+}
+
+
+enum ChatService{
+  socket,
+  graphql
+}
+
+class _HomePageState extends State<HomePage> {
+
+  ChatService groupValue = ChatService.socket;
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -49,7 +66,32 @@ class HomePage extends StatelessWidget {
             ),
             Padding(
               padding: const EdgeInsets.all(18.0),
-              child: Text('Login as :',style: TextStyle(fontSize: 30),),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: RadioListTile(
+                      value: ChatService.socket,
+                      groupValue: groupValue,
+                      title: Text('Socket'),
+                      onChanged: (va){
+                        setState(() {
+                          groupValue = va;
+                        });
+                      },
+                    ),
+                  ),
+                  Expanded(
+                    child: RadioListTile(
+                      value: ChatService.graphql,
+                      groupValue: groupValue,
+                      title: Text('Graphql'),
+                      onChanged: (va){
+                        Get.to(LoginPage());
+                      },
+                    ),
+                  ),
+                ],
+              ),
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -88,7 +130,6 @@ class HomePage extends StatelessWidget {
     G.loggedInUser = user;
     Get.to(HomeScreen());
   }
-
 }
 
 class UserButton extends StatelessWidget {

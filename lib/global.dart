@@ -15,9 +15,7 @@ class G{
   ];
 
   static List<User> getUserList(User user) {
-    List<User> filteredUsers = dummyUser
-        .where((u) => (!u.name.toLowerCase().contains(user.name.toLowerCase())))
-        .toList();
+    List<User> filteredUsers = dummyUser.where((u) => (!u.name.toLowerCase().contains(user.name.toLowerCase()))).toList();
     return filteredUsers;
   }
 

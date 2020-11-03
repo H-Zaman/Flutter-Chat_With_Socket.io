@@ -9,4 +9,15 @@ query(\$email: String!, \$password: String!){
   }
 }
 ''';
+
+  static String getAllUsers = '''
+  query{
+    users{
+      _id
+      email
+      password
+    }
+}
+''';
+
 }

@@ -1,3 +1,4 @@
+import 'package:chat_app/GRAPHQL/allUsers.dart';
 import 'package:chat_app/GRAPHQL/gqlQuerys/query.dart';
 import 'package:chat_app/GRAPHQL/registerPage.dart';
 import 'package:chat_app/GRAPHQL/screens/homeScreen.dart';
@@ -10,8 +11,8 @@ import 'getControolers/userToken.dart';
 
 class LoginPage extends StatelessWidget {
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController emailController = TextEditingController(text: 'taz');
-  final TextEditingController passwordController = TextEditingController(text: '222');
+  final TextEditingController emailController = TextEditingController(text: 'lee');
+  final TextEditingController passwordController = TextEditingController(text: '123');
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -90,9 +91,10 @@ class LoginPage extends StatelessWidget {
 
       if(!result.hasException){
         Get.offAll(GQLHomePage());
-        GetUserToken userToken = Get.find();
+        GetUserValue userToken = Get.find();
         print(result.data);
         userToken.setToken(result.data['userLogin']['token']);
+        userToken.setName(emailController.text);
       }else{
         print(result.data);
       }

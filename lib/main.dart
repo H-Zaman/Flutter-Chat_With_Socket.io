@@ -11,7 +11,7 @@ import 'models/user.dart';
 void main() {
   final GetOnlineUsers getOnlineUsers = Get.put(GetOnlineUsers());
   final GetMessage message = Get.put(GetMessage());
-  final GetUserToken getUserToken = Get.put(GetUserToken());
+  final GetUserValue getUserToken = Get.put(GetUserValue());
   runApp(MyApp());
 }
 

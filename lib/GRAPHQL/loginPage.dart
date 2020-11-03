@@ -10,8 +10,8 @@ import 'getControolers/userToken.dart';
 
 class LoginPage extends StatelessWidget {
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController emailController = TextEditingController(text: 'taz');
-  final TextEditingController passwordController = TextEditingController(text: '222');
+  final TextEditingController emailController = TextEditingController(text: 'a');
+  final TextEditingController passwordController = TextEditingController(text: 'a');
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -91,7 +91,6 @@ class LoginPage extends StatelessWidget {
       if(!result.hasException){
         Get.offAll(GQLHomePage());
         GetUserToken userToken = Get.find();
-        print(result.data);
         userToken.setToken(result.data['userLogin']['token']);
       }else{
         print(result.data);

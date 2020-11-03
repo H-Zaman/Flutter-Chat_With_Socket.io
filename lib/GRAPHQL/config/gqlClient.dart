@@ -4,6 +4,7 @@ import 'package:graphql_flutter/graphql_flutter.dart';
 class GQL{
   static final HttpLink httpLink = HttpLink(
       uri: 'https://gql-chat-v2.herokuapp.com/graphql'
+      // uri: 'http://10.0.2.2:4500/graphql'
   );
   GraphQLClient graphQLClient = GraphQLClient(link: httpLink, cache: InMemoryCache());
 
@@ -13,6 +14,7 @@ class GQL{
 
   static final WebSocketLink webSocketLink = WebSocketLink(
       url: 'wss://gql-chat-v2.herokuapp.com/graphql',
+      // url: 'ws://10.0.2.2:4500/graphql',
       config: SocketClientConfig(
         autoReconnect: true,
         inactivityTimeout: Duration(days: 1),

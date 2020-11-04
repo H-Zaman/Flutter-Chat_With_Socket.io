@@ -7,7 +7,7 @@ import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:intl/intl.dart';
 
 class NewUser extends StatelessWidget {
-  final GetUserToken userToken = Get.find();
+  final GetUserData userToken = Get.find();
   final List<NewUserModel> userList = [];
 
   @override

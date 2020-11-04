@@ -1,9 +1,17 @@
+import 'dart:convert';
+
 import 'package:chat_app/GRAPHQL/config/gqlClient.dart';
 import 'package:chat_app/GRAPHQL/getControolers/userToken.dart';
+import 'package:chat_app/GRAPHQL/gqlQuerys/mutations.dart';
 import 'package:chat_app/GRAPHQL/gqlQuerys/subscriptions.dart';
+import 'package:chat_app/GRAPHQL/model/chatMessageModel.dart';
+import 'package:flutter/animation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:intl/intl.dart';
+
+import 'chatBubble.dart';
 
 class GChat extends StatefulWidget {
   @override
@@ -14,53 +22,75 @@ class _GChatState extends State<GChat> {
 
   final _formKey = GlobalKey<FormState>();
 
-  final String id = '5fa130db7e0a0d2bbc6820ac';
+  GetUserData userData = Get.find();
 
-  GetUserToken userToken = Get.find();
+  TextEditingController chatMessage = TextEditingController();
+  ScrollController scrollController = ScrollController();
 
   @override
   void dispose() {
     super.dispose();
   }
 
-  final String userID = Get.arguments;
+  final String name = Get.arguments['name'];
+  final String id = Get.arguments['id'];
+
+  List<MessageModel> chatMessageList = [];
 
   @override
   Widget build(BuildContext context) {
     return GraphQLProvider(
-      client: GQL.initClient(userToken.token.value),
+      client: GQL.initClient(userData.token.value),
       child: Scaffold(
         backgroundColor: Colors.white,
-        appBar: AppBar(title: Text(Get.arguments),),
+        appBar: AppBar(title: Text('${userData.name} > $name'),),
         body: Column(
+          mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            Expanded(
+            Flexible(
               flex: 9,
               child: Subscription(
                 'onlineUsers',
                 GSubscription.onlineUsers,
-                variables: {"userId" : Get.arguments},
+                variables: {"userId" : userData.id.value},
                 builder: ({error, bool loading, payload}) {
-                  print(payload);
                   if(loading){
                     return Text('Loading...');
                   }else if (payload == null){
                     return Text('Empty...');
                   }else{
-                    return Text('payload');
+                    if(scrollController.hasClients){
+                      scrollController.animateTo(scrollController.position.maxScrollExtent, duration: Duration(milliseconds: 200), curve: Curves.decelerate);
+                    }
+                    ChatMessageModel data = chatMessageModelFromJson(jsonEncode(payload));
+                    chatMessageList.add(data.messageAdded);
+                    return ListView.builder(
+                      itemCount: chatMessageList.length,
+                      controller: scrollController,
+                      shrinkWrap: true,
+                      itemBuilder: (_, index){
+                        MessageModel data = chatMessageList[index];
+                        return ChatBubble(
+                          isMine: data.sender == userData.id.value,
+                          message: data.message,
+                          time: DateFormat().add_jms().format(DateTime.now()),
+                        );
+                      },
+                    );
                   }
                 },
               ),
             ),
-            Expanded(
+            Flexible(
               flex: 1,
               child: Form(
                 key: _formKey,
                 child: Row(
                   children: [
                     Expanded(
-                      flex: 7,
                       child: TextFormField(
+                        onEditingComplete: sendMessage,
+                        controller: chatMessage,
                         validator: (val) => val.isEmpty ? 'Enter Message' : null,
                         decoration: InputDecoration(
                           labelText: 'Enter Message',
@@ -68,28 +98,6 @@ class _GChatState extends State<GChat> {
                         ),
                       ),
                     ),
-                    Expanded(
-                      flex: 3,
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: InkWell(
-                          onTap: sendMessage,
-                          child: Container(
-                            height: double.infinity,
-                            color: Colors.blueGrey,
-                            child: Center(
-                              child: Text(
-                                'Send Message',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  color: Colors.white
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    )
                   ],
                 ),
               )
@@ -100,9 +108,34 @@ class _GChatState extends State<GChat> {
     );
   }
 
-  void sendMessage() {
+  void sendMessage() async {
     if(_formKey.currentState.validate()){
-
+      QueryResult result = await GQL().graphQLClient.mutate(MutationOptions(
+        documentNode: gql(GMutation.sendMessage),
+        variables:{
+          "message": chatMessage.text,
+          "sender": userData.id.value,
+          "receiver": id
+        }
+      ));
+      if(result.hasException){
+        sendFailed(result.exception.toString());
+      }else if(result.data == null){
+        sendFailed('Failed to send');
+      }else{
+        SentChatModel data = sentChatModelFromJson(jsonEncode(result.data));
+        addMessageToList(data.addMessage);
+        Get.snackbar('Sent', 'Message sent');
+        chatMessage.clear();
+      }
     }
   }
+
+  addMessageToList(MessageModel message){
+    setState(() {
+      chatMessageList.add(message);
+    });
+  }
+
+  sendFailed(String reason)=> Get.dialog(Dialog(child: Padding(padding: EdgeInsets.all(20),child: Text('Send failed > $reason'),),));
 }

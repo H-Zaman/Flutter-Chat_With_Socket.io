@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:chat_app/GRAPHQL/config/gqlClient.dart';
 import 'package:chat_app/GRAPHQL/getControolers/userToken.dart';
 import 'package:chat_app/GRAPHQL/gqlQuerys/query.dart';
+import 'package:chat_app/GRAPHQL/loginPage.dart';
 import 'package:chat_app/GRAPHQL/model/userList.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -17,7 +18,7 @@ class GQLHomePage extends StatefulWidget {
 }
 
 class _GQLHomePageState extends State<GQLHomePage> {
-  GetUserToken token = Get.find();
+  GetUserData token = Get.find();
 
   String subscriptionName = 'onlineUsers';
 
@@ -28,11 +29,16 @@ class _GQLHomePageState extends State<GQLHomePage> {
       client: GQL.initClient(token.token.value),
       child: Scaffold(
         appBar: AppBar(
+          title: Text('Welcome : ${token.name.value.toUpperCase()}'),
           actions: [
             IconButton(
               onPressed: ()=> Get.to(NewUser()),
               icon: Icon(Icons.person_add),
-            )
+            ),
+            IconButton(
+              onPressed: ()=> Get.offAll(LoginPage()),
+              icon: Icon(Icons.exit_to_app),
+            ),
           ],
         ),
         body: Query(
@@ -66,6 +72,17 @@ class _GQLHomePageState extends State<GQLHomePage> {
             }
             else{
               UserList users = userListFromJson(jsonEncode(result.data));
+
+              User loggedInUser ;
+              users.users.forEach((element) {
+                if(element.email == token.name.value){
+                  loggedInUser = element;
+                }
+              });
+
+              token.setId(loggedInUser.id);
+              users.users.remove(loggedInUser);
+
               return GridView.builder(
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 4,
@@ -78,7 +95,7 @@ class _GQLHomePageState extends State<GQLHomePage> {
                   User user = users.users[i];
                   return GestureDetector(
                     onTap: (){
-                      Get.to(GChat(),arguments: user.id);
+                      Get.to(GChat(),arguments: {'id':user.id, 'name':user.email});
                     },
                     child: Card(
                       child: Center(

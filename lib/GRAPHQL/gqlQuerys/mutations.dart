@@ -6,4 +6,22 @@ mutation(\$email: String!, \$password: String!) {
   }
 }
 ''';
+
+  static String sendMessage = '''
+mutation(\$message:String!, \$sender:ID!, \$receiver:ID!){
+  addMessage(
+    messageInput:{
+      message: \$message,
+      sender: \$sender,
+      receiver: \$receiver
+    }
+  ){
+    _id
+    message
+    sender
+    receiver
+  }
+}
+''';
+
 }

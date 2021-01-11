@@ -33,6 +33,14 @@ dependencies:
   intl: 0.16.1
   graphql_flutter: ^3.1.0
 
+  #network
+  connectivity: ^0.4.4
+  app_settings: ^4.0.4
+
+  #background services
+  flutter_local_notifications: ^3.0.2
+  workmanager: ^0.2.0
+
 
 dev_dependencies:
   flutter_test:

@@ -1,46 +1,125 @@
+import 'dart:convert';
+
+import 'package:chat_app/GRAPHQL/config/gqlClient.dart';
 import 'package:chat_app/GRAPHQL/getControolers/userToken.dart';
+import 'package:chat_app/GRAPHQL/gqlQuerys/subscriptions.dart';
 import 'package:chat_app/controller/message.dart';
 import 'package:chat_app/controller/onlineUsers.dart';
 import 'package:chat_app/homeScreen.dart';
+import 'package:chat_app/utility/localNotification.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
+import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:workmanager/workmanager.dart';
 import 'GRAPHQL/loginPage.dart';
 import 'global.dart';
 import 'models/user.dart';
 
-void main() {
-  final GetOnlineUsers getOnlineUsers = Get.put(GetOnlineUsers());
-  final GetMessage message = Get.put(GetMessage());
-  final GetUserData getUserToken = Get.put(GetUserData());
-  runApp(MyApp());
+import 'package:http/http.dart' as http;
+String uniqueName = "AndBazaar";
+Stream<FetchResult> response;
+const simplePeriodicTask = "Welcome User";
+
+void callbackDispatcher() {
+
+  Workmanager.executeTask((task, inputData) async {
+    // LocalNotification.initializer();
+    FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
+    var android = AndroidInitializationSettings('@mipmap/ic_launcher');
+    var iOS = IOSInitializationSettings();
+    var initSettings = InitializationSettings(android: android, iOS: iOS);
+    _flutterLocalNotificationsPlugin.initialize(initSettings, onSelectNotification: notificationSelected);
+    showNotification('Notification', _flutterLocalNotificationsPlugin);
+    print('hellllllllooooooooooo');
+    return Future.value(true);
+  });
 }
 
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return GetMaterialApp(
-      debugShowCheckedModeBanner: false,
-      defaultTransition: Transition.zoom,
-      theme: ThemeData(
-        scaffoldBackgroundColor: Color(0xffBDF3F0),
-        appBarTheme: AppBarTheme(color: Color(0xff6FECE4)),
-        primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
+void showNotification(String message, _flutterLocalNotificationsPlugin) async {
+  var android = AndroidNotificationDetails(
+      "111", "Background_task_Channel", "Channel to test background task",
+      priority: Priority.high, importance: Importance.max);
+  var iOS = IOSNotificationDetails();
+  var platform = NotificationDetails(android: android, iOS: iOS);
+  await _flutterLocalNotificationsPlugin.show(
+      01,
+      message,
+      '100% Sale for unlimited time!',
+      platform,
+      payload: 'You got TRICKED!...bwahahaha!!');
+
+  uniqueName+=uniqueName;
+}
+
+Future notificationSelected(String payload) async {
+  Get.snackbar('Notification', payload,
+      backgroundColor: Colors.black,
+      colorText: Colors.white,
+      snackPosition: SnackPosition.BOTTOM);
+}
+
+
+registerTask() async {
+  await Workmanager.registerPeriodicTask(
+    'newUsers',
+    'A new user!',
+    existingWorkPolicy: ExistingWorkPolicy.replace,
+    initialDelay: Duration(seconds: 5),
+    constraints: Constraints(
+      networkType: NetworkType.connected,
+    ),
+  );
+  print('task added');
+}
+
+void main() async {
+  Get.put(GetOnlineUsers());
+  Get.put(GetMessage());
+  Get.put(GetUserData());
+
+  WidgetsFlutterBinding.ensureInitialized();
+  // response = await GSubscription.newUserSubs();
+  final GetUserData userToken = Get.find();
+  await Workmanager.initialize(callbackDispatcher, isInDebugMode: true);
+
+  runApp(GetMaterialApp(
+    debugShowCheckedModeBanner: false,
+    defaultTransition: Transition.zoom,
+    theme: ThemeData(
+      scaffoldBackgroundColor: Color(0xffBDF3F0),
+      appBarTheme: AppBarTheme(color: Color(0xff6FECE4)),
+      primarySwatch: Colors.blue,
+      visualDensity: VisualDensity.adaptivePlatformDensity,
+    ),
+    home: GraphQLProvider(
+      client: GQL.initClient(userToken.token.value),
+      child: Scaffold(
+        body: Subscription(
+          'newUsers',
+          GSubscription.newUsers,
+          builder: ({error, bool loading, payload}) {
+            if(payload != null){
+              // registerTask();
+              LocalNotification.initializer();
+            }
+            return HomePage();
+          },
+        ),
       ),
-      home: HomePage(),
-    );
-  }
+    ),
+  ));
+}
+
+enum ChatService{
+  socket,
+  graphql
 }
 
 class HomePage extends StatefulWidget {
   @override
   _HomePageState createState() => _HomePageState();
-}
-
-
-enum ChatService{
-  socket,
-  graphql
 }
 
 class _HomePageState extends State<HomePage> {

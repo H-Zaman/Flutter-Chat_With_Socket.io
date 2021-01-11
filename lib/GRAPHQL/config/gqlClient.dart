@@ -21,6 +21,7 @@ class GQL{
       )
   );
 
+
   static final Link link = authLink.concat(httpLink).concat(webSocketLink);
 
   static String token;
@@ -32,6 +33,18 @@ class GQL{
             link: link
         )
     );
+    return client;
+  }
+
+  static getSocketClient(){
+    WebSocketLink webSocketLink = WebSocketLink(
+        url: 'wss://gql-chat-v2.herokuapp.com/graphql',
+        config: SocketClientConfig(
+          autoReconnect: true,
+          inactivityTimeout: Duration(days: 1),
+        )
+    );
+    GraphQLClient client = GraphQLClient(link: webSocketLink, cache:  OptimisticCache(dataIdFromObject: typenameDataIdFromObject));
     return client;
   }
 }

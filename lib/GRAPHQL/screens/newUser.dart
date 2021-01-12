@@ -1,21 +1,21 @@
 
 
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:chat_app/GRAPHQL/config/gqlClient.dart';
 import 'package:chat_app/GRAPHQL/getControolers/userToken.dart';
 import 'package:chat_app/GRAPHQL/gqlQuerys/subscriptions.dart';
+import 'package:chat_app/utility/localNotification.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:intl/intl.dart';
-import 'package:workmanager/workmanager.dart';
 
 
 
 class NewUser extends StatelessWidget {
   final GetUserData userToken = Get.find();
   final List<NewUserModel> userList = [];
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +33,6 @@ class NewUser extends StatelessWidget {
             }else if(payload == null){
               return Center(child: Text('Empty'));
             }else{
-
               print('added');
               userList.add(NewUserModel(
                 name: payload['userAdded']['email'],

@@ -1,6 +1,6 @@
-
 import 'package:chat_app/GRAPHQL/config/gqlClient.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
+
 class GSubscription{
 
   static String onlineUsers = '''
@@ -22,18 +22,14 @@ subscription newUsers{
 }  
 ''';
 
-  static newUserSubs()  async{
-
+  static newUserSubs() {
     GraphQLClient client = GQL.getSocketClient();
-
     Operation operation = Operation(
         documentNode: gql(newUsers),
         operationName: 'newUsers'
     );
-
     return client.subscribe(operation);
   }
-
 
 }
 

@@ -8,6 +8,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.4.2+1"
+  android_alarm_manager:
+    dependency: "direct main"
+    description:
+      name: android_alarm_manager
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.4.5+20"
   app_settings:
     dependency: "direct main"
     description:
@@ -22,6 +29,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.5.0-nullsafety.1"
+  awesome_notifications:
+    dependency: "direct main"
+    description:
+      name: awesome_notifications
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.0.5+4"
   boolean_selector:
     dependency: transitive
     description:
@@ -441,13 +455,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.7.3"
-  workmanager:
-    dependency: "direct main"
-    description:
-      name: workmanager
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.2.3"
   xdg_directories:
     dependency: transitive
     description:
